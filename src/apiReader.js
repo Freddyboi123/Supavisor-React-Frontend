@@ -8,6 +8,11 @@ export async function login(email, password) {
     });
 }
 
+export function logout() {
+  //localStorage.removeItem('jwtToken')
+  //localStorage.removeItem('user')
+  //localStorage.clear() 
+}
 
 export async function fetchFromServer(url, options = {}) {
   const {
@@ -70,8 +75,4 @@ export async function fetchFromServer(url, options = {}) {
   //  og så vil vi gerne have den tekst tilbage i stedet for at prøve at parse det som json og så fejle. 
   // Det er en fallback for at håndtere ikke-json svar på en mere robust måde.
 }
-export function logout() {
-  localStorage.removeItem('jwtToken')
-  localStorage.removeItem('user')
-  //localStorage.clear() 
-}
+

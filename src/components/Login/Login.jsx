@@ -1,5 +1,5 @@
 import { useState } from 'react';
-
+import {login} from '../../apiReader.js';
 
 export default function Login() {
 
@@ -17,9 +17,10 @@ export default function Login() {
     const handleSubmit = async (evt) => {
         evt.preventDefault();
         try {
-            console.log('Login submitted:', credentials);
+            await login(credentials.email, credentials.password)
+            Navigate("/")
         } catch (error) {
-            console.error('Login failed:', error);
+            console.error('Login fejlede:', error);
         }
     }
 
