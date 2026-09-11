@@ -1,4 +1,4 @@
-const BACKEND_URL = 'http://supaapi.project-ice.dk/api'
+const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
 
 export async function login(email, password) {
     return fetchFromServer('/auth/login', {

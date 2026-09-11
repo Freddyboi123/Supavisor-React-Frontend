@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import {login} from '../../apiReader.js';
-
+import { useNavigate } from "react-router";
 export default function Login() {
-
+    const navigate = useNavigate();
     const [credentials, setCredentials] = useState({
         email: '',
         password: ''
@@ -18,7 +18,7 @@ export default function Login() {
         evt.preventDefault();
         try {
             await login(credentials.email, credentials.password)
-            Navigate("/")
+            navigate("/")
         } catch (error) {
             console.error('Login fejlede:', error);
         }
