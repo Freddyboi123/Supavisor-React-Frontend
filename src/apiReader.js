@@ -14,6 +14,16 @@ export function logout() {
   //localStorage.clear() 
 }
 
+
+// add body to this method after backend is completed
+export function IsTokenValid(token) {
+  if (!token) {
+    return false;
+  }
+    return true;
+}
+
+
 export async function fetchFromServer(url, options = {}) {
   const {
     includeAuth: includeAuthOption,
