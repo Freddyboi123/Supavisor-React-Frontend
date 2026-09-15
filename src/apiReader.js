@@ -5,7 +5,12 @@ export async function login(email, password) {
         method: 'POST', 
         body: { email, password },
         includeAuth: false,
-    });
+    })
+    .then((data) => {
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        return data;
+    })
 }
 
 export function logout() {
