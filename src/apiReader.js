@@ -7,6 +7,7 @@ export async function login(email, password) {
         includeAuth: false,
     })
     .then((data) => {
+        console.log
         localStorage.setItem('jwtToken', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         return data;
@@ -22,11 +23,11 @@ export function logout() {
 
 // add body to this method after backend is completed
 export function IsTokenValid(token) {
-  if (!token) {
-    return false;
-  }
-    return true;
+  return fetchFromServer('/auth/token-validation', {
+    method: 'POST',
+  }).then(() => true).catch(() => false);
 }
+
 
 
 export async function fetchFromServer(url, options = {}) {

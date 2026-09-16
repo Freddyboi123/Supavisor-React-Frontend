@@ -1,21 +1,33 @@
 import { Navigate, Outlet } from "react-router";
 import { IsTokenValid } from "../../../src/apiReader";
+import { useState, useEffect } from "react";
 
 export default function ProtectedRoute() {
+  const [token] = useState(localStorage.getItem('jwtToken'));
+  const [tokenIsValid, setTokenIsValid] = useState(null); // null = "still checking"
 
-  
-  const token = localStorage.getItem("jwtToken");
-  const tokenIsValid = IsTokenValid(token);
+
+  useEffect(() => {
+    if (!token) return;
+
+    IsTokenValid(token).then((isValid) => {
+      setTokenIsValid(isValid);
+    });
+  }, [token]);
+
 
   
   if (!token) {
-    console.log("No token found. Redirecting to login page.");
     return <Navigate to="/auth/login" replace />;
+  }
 
-    } else if (!tokenIsValid) {
-      console.log("Token is invalid. Redirecting to login page.");
-      return <Navigate to="/auth/login" replace />;
-    }
-  
+  if (tokenIsValid === null) {
+    return null; // or a loading spinner, while we wait for the check
+  }
+
+  if (!tokenIsValid) {
+    return <Navigate to="/auth/login" replace />;
+  }
+
   return <Outlet />;
 }
