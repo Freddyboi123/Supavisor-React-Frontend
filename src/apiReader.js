@@ -5,7 +5,13 @@ export async function login(email, password) {
         method: 'POST', 
         body: { email, password },
         includeAuth: false,
-    });
+    })
+    .then((data) => {
+        console.log
+        localStorage.setItem('jwtToken', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        return data;
+    })
 }
 
 export function logout() {
@@ -13,6 +19,16 @@ export function logout() {
   //localStorage.removeItem('user')
   //localStorage.clear() 
 }
+
+
+// add body to this method after backend is completed
+export function IsTokenValid(token) {
+  return fetchFromServer('/auth/token-validation', {
+    method: 'POST',
+  }).then(() => true).catch(() => false);
+}
+
+
 
 export async function fetchFromServer(url, options = {}) {
   const {
@@ -68,6 +84,10 @@ export async function fetchFromServer(url, options = {}) {
   const contentType = response.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
     return response.json()
+  }
+  if (response.headers.has('X-Refresh-Token')) {
+    const newToken = response.headers.get('X-Refresh-Token')
+    localStorage.setItem('jwtToken', newToken)
   }
   return response.text() 
   //Forstår ikke helt hvorfor vi returnere text 
