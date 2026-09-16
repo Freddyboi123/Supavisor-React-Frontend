@@ -84,6 +84,10 @@ export async function fetchFromServer(url, options = {}) {
   if (contentType.includes('application/json')) {
     return response.json()
   }
+  if (response.headers.has('X-Refresh-Token')) {
+    const newToken = response.headers.get('X-Refresh-Token')
+    localStorage.setItem('jwtToken', newToken)
+  }
   return response.text() 
   //Forstår ikke helt hvorfor vi returnere text 
   // men det er fordi at hvis det ikke er json så kan det være en fejlbesked eller lignende som bare er tekst,
