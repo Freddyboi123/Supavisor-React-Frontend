@@ -29,7 +29,7 @@ export function IsTokenValid(token) {
 }
 
 export async function fetchEmployeesFromAPI(tenantId) {
-  return fetchFromServer(`/user/tenants/${encodeURIComponent(tenantId)}`, {
+  return fetchFromServer(`/user/tenant/${encodeURIComponent(tenantId)}`, {
     method: 'GET',
   });
 }

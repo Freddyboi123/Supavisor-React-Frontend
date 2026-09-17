@@ -1,11 +1,17 @@
 import { useState, useEffect } from 'react';
 import { fetchEmployeesFromAPI } from './apiReader'; // Assuming you have an API reader function
+import { getUserFromToken } from './components/Utils/GetUser';
+
 export default function Admin() {
 
   const [ArrayOfEmplyees, setArrayOfEmployees] = useState([]);
-
+  const [user, setUser] = useState(null);
   useEffect(() => {
   (async () => {
+
+    const loggedInUser = getUserFromToken();
+    setUser(loggedInUser);
+    console.log('Logged-in user:', loggedInUser);
     try {
       const response = await fetchEmployeesFromAPI(1);// hardcoded fix later
       setArrayOfEmployees(response);
