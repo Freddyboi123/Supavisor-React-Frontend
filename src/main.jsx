@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
 
 import './index.css'
-import App from './App.jsx'
+import Admin from './Admin.jsx'
 import ProtectedRoute from './components/ProtectedRoute/PathRedirector.jsx'
 import Auth from './components/Auth/AuthLayout.jsx'
 import Login from './components/Login/Login.jsx'
@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(
 
         <Route element={<ProtectedRoute />}>
           
-          <Route path="*" element={<App />} />
+          <Route path="*" element={<Admin />} />
 
         </Route>
 

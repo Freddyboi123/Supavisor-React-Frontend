@@ -28,7 +28,11 @@ export function IsTokenValid(token) {
   }).then(() => true).catch(() => false);
 }
 
-
+export async function fetchEmployeesFromAPI(tenantId) {
+  return fetchFromServer(`/user/tenants/${encodeURIComponent(tenantId)}`, {
+    method: 'GET',
+  });
+}
 
 export async function fetchFromServer(url, options = {}) {
   const {

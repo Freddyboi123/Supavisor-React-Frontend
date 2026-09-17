@@ -20,7 +20,7 @@ export default function Login() {
             await login(credentials.email, credentials.password)
             navigate("/")
         } catch (error) {
-            Allert("Email eller password er forkert. Prøv igen.");
+            alert("Email eller password er forkert. Prøv igen.");
         }
     }
 
