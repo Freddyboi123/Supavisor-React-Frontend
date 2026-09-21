@@ -19,11 +19,8 @@ export default function Login() {
         try {
             await login(credentials.email, credentials.password)
             navigate("/")
-            console.log('Login successful');
-            console.log('JWT Token:', localStorage.getItem('jwtToken'));
-            console.log('User:', localStorage.getItem('user'));
         } catch (error) {
-            console.error('Login fejlede:', error);
+            alert("Email eller password er forkert. Prøv igen.");
         }
     }
 

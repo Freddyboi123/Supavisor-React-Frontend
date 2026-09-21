@@ -18,7 +18,9 @@ export default function ProtectedRoute() {
 
   
   if (!token) {
+    alert("Du skal være logget ind for at få adgang til denne side. Log ind for at fortsætte.");
     return <Navigate to="/auth/login" replace />;
+    
   }
 
   if (tokenIsValid === null) {
@@ -26,6 +28,7 @@ export default function ProtectedRoute() {
   }
 
   if (!tokenIsValid) {
+    alert("Din session er udløbet. Log ind igen for at fortsætte.");
     return <Navigate to="/auth/login" replace />;
   }
 

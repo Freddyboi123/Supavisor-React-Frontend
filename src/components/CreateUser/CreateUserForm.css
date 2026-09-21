@@ -1,0 +1,54 @@
+.create-user {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.create-user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 420px;
+}
+
+.create-user-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.create-user-error {
+  color: #c62828;
+  margin: 0;
+}
+
+.create-user-success {
+  margin-top: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.create-user-success p {
+  margin: 0 0 8px;
+}
+
+.create-user-roles {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.create-user-form .create-user-role {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.create-user-hint {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}

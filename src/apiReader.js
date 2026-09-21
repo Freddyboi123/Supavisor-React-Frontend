@@ -21,14 +21,140 @@ export function logout() {
 }
 
 
-// add body to this method after backend is completed
+
 export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
   }).then(() => true).catch(() => false);
 }
 
+export async function fetchEmployeesFromAPI(tenantId) {
+  return fetchFromServer(`/user/tenant/${encodeURIComponent(tenantId)}`, {
+    method: 'GET',
+  });
+}
 
+
+export async function updateEmployeeInAPI(updatedEmployee) {
+  return fetchFromServer(`/user/update/`, {
+  
+    method: 'PUT',
+    body: { 
+      id: updatedEmployee.id,
+      name: updatedEmployee.name,
+      email: updatedEmployee.email,
+      phoneNumber: updatedEmployee.phoneNumber,
+      tenantId: updatedEmployee.tenantId,
+
+     },
+  });
+}
+
+// Creates a user in the administrator's tenant. systemRole is 'ADMIN' or 'USER';
+// customRoleIds are ids of the company's own roles. Resolves to { user, temporaryPassword }.
+export async function createUserInAPI({ name, email, systemRole, customRoleIds }) {
+  return fetchFromServer('/user/create', {
+    method: 'POST',
+    body: { name, email, roles: [systemRole], customRoleIds },
+  });
+}
+
+// The company's own (user defined) roles, e.g. kitchen or cleaning.
+export async function fetchRolesFromAPI(tenantId) {
+  return fetchFromServer(`/role/tenant/${encodeURIComponent(tenantId)}`, {
+    method: 'GET',
+  });
+}
+
+export async function createRoleInAPI(roleName) {
+  return fetchFromServer('/role/', {
+    method: 'POST',
+    body: { roleName },
+  });
+}
+
+export async function deleteRoleInAPI(roleId) {
+  return fetchFromServer(`/role/${encodeURIComponent(roleId)}`, {
+    method: 'DELETE',
+  });
+}
+
+// Assignments: the recurring kinds of work an administrator defines for the company.
+// Administrators get every assignment (deactivated ones included); pass activeOnly to get only the selectable ones.
+export async function fetchAssignmentsFromAPI({ activeOnly = false } = {}) {
+  return fetchFromServer(`/assignment/all${activeOnly ? '?activeOnly=true' : ''}`, {
+    method: 'GET',
+  });
+}
+
+// An assignment is a template: { name, address, estimatedMinutes, cost, assignedEmployeeId }.
+// Only the name is required; the other details may be null.
+export async function createAssignmentInAPI(assignment) {
+  return fetchFromServer('/assignment', {
+    method: 'POST',
+    body: assignment,
+  });
+}
+
+// Replaces the name and ALL details: a detail that is left out or null is cleared on the server.
+// The active flag is not touched (use activate / deactivate for that).
+export async function updateAssignmentInAPI(id, assignment) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: assignment,
+  });
+}
+
+export async function deactivateAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}/deactivate`, {
+    method: 'PATCH',
+  });
+}
+
+export async function activateAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}/activate`, {
+    method: 'PATCH',
+  });
+}
+
+// Rejected with 409 while the assignment is still in use; deactivate it instead.
+export async function deleteAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
+// TODO: deactivate the user with this id on the backend
+export async function deactivateUserInAPI(employeeId) {
+  return fetchFromServer(`/user/reversActivtion/${encodeURIComponent(employeeId)}`, {
+    method: 'PUT'
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+// The API answers errors as {"status":..., "msg":"..."}; pull out the msg when it is there.
+function extractServerMessage(errorText) {
+  try {
+    const msg = JSON.parse(errorText)?.msg
+    return typeof msg === 'string' && msg ? msg : null
+  } catch {
+    return errorText || null
+  }
+}
+
+// Message that is fit to show a user, falling back to the technical one.
+export function getErrorMessage(error) {
+  return error?.serverMessage ?? error?.message ?? 'Something went wrong'
+}
 
 export async function fetchFromServer(url, options = {}) {
   const {
@@ -78,12 +204,20 @@ export async function fetchFromServer(url, options = {}) {
 
   if (!response.ok) {
     const errorText = await response.text().catch(() => '')
-    throw new Error(`Request failed (${method} ${finalUrl}): ${response.status} ${errorText}`.trim())
+    const error = new Error(`Request failed (${method} ${finalUrl}): ${response.status} ${errorText}`.trim())
+    error.status = response.status
+    error.serverMessage = extractServerMessage(errorText)
+    throw error
   }
 
   const contentType = response.headers.get('content-type') ?? ''
   if (contentType.includes('application/json')) {
-    return response.json()
+    const text = await response.text()
+    try {
+      return JSON.parse(text)
+    } catch {
+      return text
+    }
   }
   if (response.headers.has('X-Refresh-Token')) {
     const newToken = response.headers.get('X-Refresh-Token')
