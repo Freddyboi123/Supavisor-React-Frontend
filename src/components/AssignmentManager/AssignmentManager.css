@@ -1,0 +1,113 @@
+.assignment-manager {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.assignment-create {
+  margin-bottom: 16px;
+}
+
+.assignment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.assignment-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  font-size: 14px;
+}
+
+.assignment-form-row {
+  display: flex;
+  gap: 8px;
+}
+
+.assignment-form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.assignment-manager ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 620px;
+}
+
+.assignment-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.assignment-inactive .assignment-details {
+  opacity: 0.55;
+}
+
+.assignment-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.assignment-name {
+  font-weight: 600;
+}
+
+.assignment-status {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.assignment-details dl {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.assignment-details dl div {
+  display: flex;
+  gap: 8px;
+}
+
+.assignment-details dt {
+  min-width: 110px;
+  opacity: 0.7;
+}
+
+.assignment-details dd {
+  margin: 0;
+}
+
+.assignment-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.assignment-delete {
+  color: #c62828;
+}
+
+.assignment-error {
+  flex-basis: 100%;
+  color: #c62828;
+  margin: 0;
+}
+
+.assignment-hint {
+  font-size: 14px;
+  opacity: 0.7;
+}

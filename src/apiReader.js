@@ -79,6 +79,51 @@ export async function deleteRoleInAPI(roleId) {
   });
 }
 
+// Assignments: the recurring kinds of work an administrator defines for the company.
+// Administrators get every assignment (deactivated ones included); pass activeOnly to get only the selectable ones.
+export async function fetchAssignmentsFromAPI({ activeOnly = false } = {}) {
+  return fetchFromServer(`/assignment/all${activeOnly ? '?activeOnly=true' : ''}`, {
+    method: 'GET',
+  });
+}
+
+// An assignment is a template: { name, address, estimatedMinutes, cost, assignedEmployeeId }.
+// Only the name is required; the other details may be null.
+export async function createAssignmentInAPI(assignment) {
+  return fetchFromServer('/assignment', {
+    method: 'POST',
+    body: assignment,
+  });
+}
+
+// Replaces the name and ALL details: a detail that is left out or null is cleared on the server.
+// The active flag is not touched (use activate / deactivate for that).
+export async function updateAssignmentInAPI(id, assignment) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: assignment,
+  });
+}
+
+export async function deactivateAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}/deactivate`, {
+    method: 'PATCH',
+  });
+}
+
+export async function activateAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}/activate`, {
+    method: 'PATCH',
+  });
+}
+
+// Rejected with 409 while the assignment is still in use; deactivate it instead.
+export async function deleteAssignmentInAPI(id) {
+  return fetchFromServer(`/assignment/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
 // TODO: deactivate the user with this id on the backend
 export async function deactivateUserInAPI(employeeId) {
   return fetchFromServer(`/user/reversActivtion/${encodeURIComponent(employeeId)}`, {

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI } from './apiReader'; // Assuming you have an API reader function
+import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from './apiReader'; // Assuming you have an API reader function
 import { getUserFromToken } from './components/Utils/GetUser';
 import EmployeeList from './components/EmployeeList/EmployeeList';
 import CreateUserForm from './components/CreateUser/CreateUserForm';
 import RoleManager from './components/RoleManager/RoleManager';
+import AssignmentManager from './components/AssignmentManager/AssignmentManager';
 
 export default function Admin() {
 
   const [ArrayOfEmplyees, setArrayOfEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [user, setUser] = useState(null);
   useEffect(() => {
   (async () => {
@@ -28,6 +30,11 @@ export default function Admin() {
       setRoles(await fetchRolesFromAPI(loggedInUser?.tenantId));
     } catch (error) {
       console.error('Error fetching roles:', error);
+    }
+    try {
+      setAssignments(await fetchAssignmentsFromAPI());
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
     }
   })();
 }, []);
@@ -60,6 +67,22 @@ export default function Admin() {
     );
   };
 
+  const handleAssignmentCreated = (createdAssignment) => {
+    setAssignments((prev) => [...prev, createdAssignment]);
+  };
+
+  const handleAssignmentUpdated = (updatedAssignment) => {
+    setAssignments((prev) =>
+      prev.map((assignment) =>
+        assignment.id === updatedAssignment.id ? updatedAssignment : assignment
+      )
+    );
+  };
+
+  const handleAssignmentDeleted = (assignmentId) => {
+    setAssignments((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
+  };
+
   return (
     <>
       <h1> you are on admin page</h1>
@@ -74,6 +97,14 @@ export default function Admin() {
         roles={roles}
         onRoleCreated={handleRoleCreated}
         onRoleDeleted={handleRoleDeleted}
+      />
+
+      <AssignmentManager
+        assignments={assignments}
+        employees={ArrayOfEmplyees}
+        onAssignmentCreated={handleAssignmentCreated}
+        onAssignmentUpdated={handleAssignmentUpdated}
+        onAssignmentDeleted={handleAssignmentDeleted}
       />
 
       <EmployeeList
