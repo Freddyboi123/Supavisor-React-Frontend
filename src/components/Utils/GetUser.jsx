@@ -15,6 +15,16 @@ export function decodeJWT(token) {
 }
 
 /**
+ * True when the employee is the logged-in user. `user` is the decoded JWT payload.
+ * Older tokens carry no userId, so those fall back to comparing emails.
+ */
+export function isCurrentUser(user, employee) {
+  if (!user || !employee) return false;
+  if (user.userId != null) return user.userId === employee.id;
+  return !!user.email && user.email.toLowerCase() === (employee.email ?? '').toLowerCase();
+}
+
+/**
  * Returns the JWT payload for the logged-in user, or null if not logged in.
  * @returns {object|null}
  */
