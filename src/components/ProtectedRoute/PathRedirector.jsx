@@ -35,9 +35,9 @@ export default function ProtectedRoute() {
   }
 
 
-  if (currentUser.isActive === false) {
-    alert("Din konto er deaktiveret. Kontakt venligst administratoren for at få adgang.");
-    return <Navigate to="/auth/login" replace />;
-  }
+  //if (currentUser.isActive === false) {
+  //  alert("Din konto er deaktiveret. Kontakt venligst administratoren for at få adgang.");
+  //  return <Navigate to="/auth/login" replace />;
+  //}
   return <Outlet />;
 }

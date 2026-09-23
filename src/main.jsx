@@ -24,10 +24,10 @@ createRoot(document.getElementById('root')).render(
         </Route>
 
         <Route element={<ProtectedRoute />}>
-          <Route element={<AdminOnly />} >
+         
           <Route path="*" element={<Admin />} />  
 
-          </Route>
+          
           <Route element={<Employee />} >
           
           </Route>
