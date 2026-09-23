@@ -30,6 +30,5 @@ export function isCurrentUser(user, employee) {
  */
 export function getUserFromToken() {
   const token = localStorage.getItem('jwtToken');
-  console.log('Retrieved JWT Token:', token); // Debugging line
   return decodeJWT(token);
 }

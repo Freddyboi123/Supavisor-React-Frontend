@@ -1,4 +1,6 @@
-const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+//const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
+
 
 export async function login(email, password) {
     return fetchFromServer('/auth/login', {
@@ -8,8 +10,8 @@ export async function login(email, password) {
     })
     .then((data) => {
         console.log
-        localStorage.setItem('jwtToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+    ('Login successful, received data:', data); // Debugging line
+    localStorage.setItem('jwtToken', data.token);
         return data;
     })
 }
