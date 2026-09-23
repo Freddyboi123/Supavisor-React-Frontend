@@ -10,7 +10,7 @@ export async function login(email, password) {
     })
     .then((data) => {
         console.log
-    ('Login successful, received data:', data); // Debugging line
+   
     localStorage.setItem('jwtToken', data.token);
         return data;
     })
@@ -135,10 +135,12 @@ export async function deactivateUserInAPI(employeeId) {
 }
 
 
-
-
-
-
+export async function changeUserRole(employeeId, customRoleIds) {
+  return fetchFromServer(`/user/${encodeURIComponent(employeeId)}/roles`, {
+    method: 'PUT',
+    body: { customRoleIds }
+  });
+}
 
 
 
