@@ -1,16 +1,23 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from './apiReader'; // Assuming you have an API reader function
+import {
+  fetchEmployeesFromAPI,
+  fetchRolesFromAPI,
+  fetchAssignmentsFromAPI,
+  fetchProjectsFromAPI,
+} from './apiReader'; // Assuming you have an API reader function
 import { getUserFromToken } from './components/Utils/GetUser';
 import EmployeeList from './components/EmployeeList/EmployeeList';
 import CreateUserForm from './components/CreateUser/CreateUserForm';
 import RoleManager from './components/RoleManager/RoleManager';
 import AssignmentManager from './components/AssignmentManager/AssignmentManager';
+import ProjectManager from './components/ProjectManager/ProjectManager';
 
 export default function Admin() {
 
   const [ArrayOfEmplyees, setArrayOfEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [projects, setProjects] = useState([]);
   const [user, setUser] = useState(null);
   useEffect(() => {
   (async () => {
@@ -35,6 +42,11 @@ export default function Admin() {
       setAssignments(await fetchAssignmentsFromAPI());
     } catch (error) {
       console.error('Error fetching assignments:', error);
+    }
+    try {
+      setProjects(await fetchProjectsFromAPI());
+    } catch (error) {
+      console.error('Error fetching projects:', error);
     }
   })();
 }, []);
@@ -83,6 +95,22 @@ export default function Admin() {
     setAssignments((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
   };
 
+  const handleProjectCreated = (createdProject) => {
+    setProjects((prev) => [...prev, createdProject]);
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === updatedProject.id ? updatedProject : project
+      )
+    );
+  };
+
+  const handleProjectDeleted = (projectId) => {
+    setProjects((prev) => prev.filter((project) => project.id !== projectId));
+  };
+
   return (
     <>
       <h1> you are on admin page</h1>
@@ -105,6 +133,14 @@ export default function Admin() {
         onAssignmentCreated={handleAssignmentCreated}
         onAssignmentUpdated={handleAssignmentUpdated}
         onAssignmentDeleted={handleAssignmentDeleted}
+      />
+
+      <ProjectManager
+        projects={projects}
+        assignments={assignments}
+        onProjectCreated={handleProjectCreated}
+        onProjectUpdated={handleProjectUpdated}
+        onProjectDeleted={handleProjectDeleted}
       />
 
       <EmployeeList
