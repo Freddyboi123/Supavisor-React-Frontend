@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from './apiReader'; // Assuming you have an API reader function
+import {
+  fetchEmployeesFromAPI,
+  fetchRolesFromAPI,
+  fetchAssignmentsFromAPI,
+  fetchEmployeeCategoriesFromAPI,
+} from './apiReader'; // Assuming you have an API reader function
 import { getUserFromToken } from './components/Utils/GetUser';
 import EmployeeList from './components/EmployeeList/EmployeeList';
 import CreateUserForm from './components/CreateUser/CreateUserForm';
@@ -11,6 +16,7 @@ export default function Admin() {
   const [ArrayOfEmplyees, setArrayOfEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [user, setUser] = useState(null);
   useEffect(() => {
   (async () => {
@@ -35,6 +41,11 @@ export default function Admin() {
       setAssignments(await fetchAssignmentsFromAPI());
     } catch (error) {
       console.error('Error fetching assignments:', error);
+    }
+    try {
+      setCategories(await fetchEmployeeCategoriesFromAPI({ activeOnly: true }));
+    } catch (error) {
+      console.error('Error fetching employee categories:', error);
     }
   })();
 }, []);
@@ -109,6 +120,7 @@ export default function Admin() {
 
       <EmployeeList
         employees={ArrayOfEmplyees}
+        categories={categories}
         currentUser={user}
         onEmployeeUpdated={handleEmployeeUpdated}
       />
