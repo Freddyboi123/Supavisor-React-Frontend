@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router";
 import { IsTokenValid } from "../../../src/apiReader";
 import { useState, useEffect } from "react";
+import { getUserFromToken } from "../Utils/GetUser.jsx";
 
 export default function ProtectedRoute() {
   const [token] = useState(localStorage.getItem('jwtToken'));
   const [tokenIsValid, setTokenIsValid] = useState(null); // null = "still checking"
+  const [currentUser] = useState(getUserFromToken());
 
 
   useEffect(() => {
@@ -32,5 +34,10 @@ export default function ProtectedRoute() {
     return <Navigate to="/auth/login" replace />;
   }
 
+
+  if (currentUser.isActive === false) {
+    alert("Din konto er deaktiveret. Kontakt venligst administratoren for at få adgang.");
+    return <Navigate to="/auth/login" replace />;
+  }
   return <Outlet />;
 }
