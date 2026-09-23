@@ -1,4 +1,5 @@
-const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+// const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
 
 export async function login(email, password) {
     return fetchFromServer('/auth/login', {
@@ -22,7 +23,7 @@ export function logout() {
 
 
 
-export function IsTokenValid(token) {
+export function IsTokenValid() {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
   }).then(() => true).catch(() => false);
@@ -157,6 +158,12 @@ export async function updateProjectInAPI(id, project) {
 export async function deleteProjectInAPI(id) {
   return fetchFromServer(`/project/${encodeURIComponent(id)}`, {
     method: 'DELETE',
+  });
+}
+
+export async function fetchProjectStatusHistoryFromAPI(projectId) {
+  return fetchFromServer(`/project/${encodeURIComponent(projectId)}/status-history`, {
+    method: 'GET',
   });
 }
 
