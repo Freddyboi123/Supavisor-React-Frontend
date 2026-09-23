@@ -1,5 +1,10 @@
 import { useState } from 'react';
-import { updateEmployeeInAPI, deactivateUserInAPI, getErrorMessage } from '../../apiReader';
+import {
+  updateEmployeeInAPI,
+  deactivateUserInAPI,
+  assignPrimaryCategoryInAPI,
+  getErrorMessage,
+} from '../../apiReader';
 import { isCurrentUser } from '../Utils/GetUser';
 import './EmployeeList.css';
 
@@ -23,14 +28,20 @@ function statusLabel(isActive) {
   return 'Unknown';
 }
 
-function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
+function categoryName(category) {
+  return category.name ?? category.categoryName ?? category.employeeCategoryName ?? 'Unnamed category';
+}
+
+function EmployeeItem({ employee, categories, isSelf, onEmployeeUpdated }) {
   const [isEditing, setIsEditing] = useState(false);
   const [draft, setDraft] = useState(employee);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(employee.primaryCategoryId ?? '');
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
 
   const startEditing = () => {
     setDraft(employee);
+    setSelectedCategoryId(employee.primaryCategoryId ?? '');
     setError(null);
     setIsEditing(true);
   };
@@ -51,7 +62,20 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
     setError(null);
     try {
       await updateEmployeeInAPI(draft);
-      onEmployeeUpdated({ ...employee, ...draft });
+      let updatedEmployee = { ...employee, ...draft };
+      if (String(employee.primaryCategoryId ?? '') !== String(selectedCategoryId)) {
+        const savedCategory = categories.find((category) => String(category.id) === String(selectedCategoryId));
+        const primaryCategoryId = savedCategory?.id ?? selectedCategoryId;
+        const response = await assignPrimaryCategoryInAPI(employee.id, primaryCategoryId);
+        updatedEmployee = typeof response === 'object' && response !== null
+          ? response
+          : {
+              ...updatedEmployee,
+              primaryCategoryId,
+              primaryCategoryName: savedCategory ? categoryName(savedCategory) : null,
+            };
+      }
+      onEmployeeUpdated(updatedEmployee);
       setIsEditing(false);
     } catch (err) {
       setError(getErrorMessage(err));
@@ -91,6 +115,7 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
             </h3>
           ))}
           <h3>Company roles: {customRolesLabel(employee)}</h3>
+          <h3>Primary category: {employee.primaryCategoryName ?? 'None'}</h3>
           <h3>Status: {statusLabel(employee[ACTIVE_FIELD])}</h3>
         </div>
         <button type="button" onClick={startEditing}>Edit</button>
@@ -119,6 +144,25 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
           </label>
           )
         )}
+        <label>
+          Primary category
+          <select
+            value={selectedCategoryId}
+            onChange={(evt) => setSelectedCategoryId(evt.target.value)}
+            disabled={isSaving || categories.length === 0}
+          >
+            {!employee.primaryCategoryId && <option value="" disabled>Select category</option>}
+            {employee.primaryCategoryId && !categories.some((category) => String(category.id) === String(employee.primaryCategoryId)) && (
+              <option value={employee.primaryCategoryId}>{employee.primaryCategoryName ?? 'Current category'}</option>
+            )}
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {categoryName(category)}
+              </option>
+            ))}
+          </select>
+        </label>
+        {categories.length === 0 && <p className="employee-hint">No active categories available.</p>}
         {error && <p className="employee-error">Could not save: {error}</p>}
         <div className="employee-actions">
           <button type="submit" disabled={isSaving}>
@@ -147,7 +191,7 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
   );
 }
 
-export default function EmployeeList({ employees, currentUser, onEmployeeUpdated }) {
+export default function EmployeeList({ employees, categories = [], currentUser, onEmployeeUpdated }) {
   return (
     <div className="employee-list">
       <h2>Employee List</h2>
@@ -156,6 +200,7 @@ export default function EmployeeList({ employees, currentUser, onEmployeeUpdated
           <EmployeeItem
             key={employee.id}
             employee={employee}
+            categories={categories}
             isSelf={isCurrentUser(currentUser, employee)}
             onEmployeeUpdated={onEmployeeUpdated}
           />

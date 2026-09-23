@@ -25,6 +25,8 @@ export function logout() {
 export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    includeAuth: false,
   }).then(() => true).catch(() => false);
 }
 
@@ -84,6 +86,19 @@ export async function deleteRoleInAPI(roleId) {
 export async function fetchAssignmentsFromAPI({ activeOnly = false } = {}) {
   return fetchFromServer(`/assignment/all${activeOnly ? '?activeOnly=true' : ''}`, {
     method: 'GET',
+  });
+}
+
+export async function fetchEmployeeCategoriesFromAPI({ activeOnly = false } = {}) {
+  return fetchFromServer(`/employee-category/all${activeOnly ? '?activeOnly=true' : ''}`, {
+    method: 'GET',
+  });
+}
+
+export async function assignPrimaryCategoryInAPI(userId, primaryCategoryId) {
+  return fetchFromServer(`/user/${encodeURIComponent(userId)}/primary-category`, {
+    method: 'PUT',
+    body: { primaryCategoryId },
   });
 }
 
@@ -229,4 +244,3 @@ export async function fetchFromServer(url, options = {}) {
   //  og så vil vi gerne have den tekst tilbage i stedet for at prøve at parse det som json og så fejle. 
   // Det er en fallback for at håndtere ikke-json svar på en mere robust måde.
 }
-
