@@ -27,10 +27,11 @@ export function logout() {
 export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
+    body: { token },
   }).then(() => true).catch(() => false);
 }
 
-export async function fetchEmployeesFromAPI(tenantId) {
+export async function fetchEmployeeFromTenant(tenantId) {
   return fetchFromServer(`/user/tenant/${encodeURIComponent(tenantId)}`, {
     method: 'GET',
   });

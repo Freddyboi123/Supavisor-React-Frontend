@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { updateEmployeeInAPI, deactivateUserInAPI, getErrorMessage } from '../../apiReader';
-import { isCurrentUser } from '../Utils/GetUser';
+import { updateEmployeeInAPI, deactivateUserInAPI, getErrorMessage } from '../../../../../apiReader';
+import { isCurrentUser } from '../../../../Utils/GetUser';
 import './EmployeeList.css';
 
 const EDITABLE_FIELDS = [

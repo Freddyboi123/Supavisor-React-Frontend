@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../apiReader'; // Assuming you have an API reader function
-import { getUserFromToken } from './Utils/GetUser';
-import EmployeeList from './EmployeeList/EmployeeList';
+import { fetchEmployeeFromTenant, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../../../apiReader'; // Assuming you have an API reader function
+import { getUserFromToken } from '../../Utils/GetUser';
+import EmployeeList from './RoleManager/EmployeeList/EmployeeList';
 import CreateUserForm from './CreateUser/CreateUserForm';
 import RoleManager from './RoleManager/RoleManager';
-import AssignmentManager from './AssignmentManager/AssignmentManager';
+import AssignmentManager from '../../AssignmentManager/AssignmentManager';
 
 export default function Admin() {
 
@@ -20,7 +20,7 @@ export default function Admin() {
     console.log('Logged-in user:', loggedInUser);
     try {
       const tennentID = loggedInUser?.tenantId;
-      const response = await fetchEmployeesFromAPI(tennentID);
+      const response = await fetchEmployeeFromTenant(tennentID);
       setArrayOfEmployees(response);
       console.log('Fetched employees:', response);
     } catch (error) {
