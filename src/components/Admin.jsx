@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from './apiReader'; // Assuming you have an API reader function
-import { getUserFromToken } from './components/Utils/GetUser';
-import EmployeeList from './components/EmployeeList/EmployeeList';
-import CreateUserForm from './components/CreateUser/CreateUserForm';
-import RoleManager from './components/RoleManager/RoleManager';
-import AssignmentManager from './components/AssignmentManager/AssignmentManager';
+import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../apiReader'; // Assuming you have an API reader function
+import { getUserFromToken } from './Utils/GetUser';
+import EmployeeList from './EmployeeList/EmployeeList';
+import CreateUserForm from './CreateUser/CreateUserForm';
+import RoleManager from './RoleManager/RoleManager';
+import AssignmentManager from './AssignmentManager/AssignmentManager';
 
 export default function Admin() {
 

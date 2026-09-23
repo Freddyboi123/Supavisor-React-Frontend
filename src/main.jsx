@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router'
 
 import './index.css'
-import Admin from './Admin.jsx'
+import Admin from './components/Admin.jsx'
 import ProtectedRoute from './components/ProtectedRoute/PathRedirector.jsx'
 import AdminOnly from './components/ProtectedRoute/AdminOnly.jsx'
 import Employee from './components/ProtectedRoute/Employee.jsx'
@@ -24,10 +24,9 @@ createRoot(document.getElementById('root')).render(
         </Route>
 
         <Route element={<ProtectedRoute />}>
-         
-          <Route path="*" element={<Admin />} />  
-
-          
+          <Route element={<AdminOnly />} >
+          <Route path="*" element={<Admin />} /> 
+          </Route>
           <Route element={<Employee />} >
           
           </Route>
