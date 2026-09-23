@@ -1,5 +1,5 @@
 import { Outlet, Navigate } from "react-router";
-import { getUserFromToken } from "../Utils/GetUser.jsx";
+import { getUserFromToken } from "../../Utils/GetUser.jsx";
 import { useState } from "react";
 
 function  AdminOnly (){

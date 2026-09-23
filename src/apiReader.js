@@ -10,7 +10,7 @@ export async function login(email, password) {
     })
     .then((data) => {
         console.log
-    ('Login successful, received data:', data); // Debugging line
+   
     localStorage.setItem('jwtToken', data.token);
         return data;
     })
@@ -27,10 +27,11 @@ export function logout() {
 export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
+    body: { token },
   }).then(() => true).catch(() => false);
 }
 
-export async function fetchEmployeesFromAPI(tenantId) {
+export async function fetchEmployeeFromTenant(tenantId) {
   return fetchFromServer(`/user/tenant/${encodeURIComponent(tenantId)}`, {
     method: 'GET',
   });
@@ -134,10 +135,12 @@ export async function deactivateUserInAPI(employeeId) {
 }
 
 
-
-
-
-
+export async function changeUserRole(employeeId, customRoleIds) {
+  return fetchFromServer(`/user/${encodeURIComponent(employeeId)}/roles`, {
+    method: 'PUT',
+    body: { customRoleIds }
+  });
+}
 
 
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { updateEmployeeInAPI, deactivateUserInAPI, getErrorMessage } from '../../apiReader';
-import { isCurrentUser } from '../Utils/GetUser';
+import { updateEmployeeInAPI, deactivateUserInAPI, changeUserRole, getErrorMessage } from '../../../../apiReader';
+import { isCurrentUser } from '../../../Utils/GetUser';
 import './EmployeeList.css';
 
 const EDITABLE_FIELDS = [
@@ -23,8 +23,71 @@ function statusLabel(isActive) {
   return 'Unknown';
 }
 
-function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
+// Lets an administrator change which of the company's custom roles (Kitchen, Cleaning, ...) an
+// employee has. It does not touch the employee's system access (Employee/Administrator).
+function RoleEditor({ employee, companyRoles, onSave, onCancel }) {
+  const [customRoleIds, setCustomRoleIds] = useState(
+    (employee.customRoles ?? []).map((role) => role.id)
+  );
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState(null);
+
+  const handleToggleRole = (roleId) => {
+    setCustomRoleIds((prev) =>
+      prev.includes(roleId) ? prev.filter((id) => id !== roleId) : [...prev, roleId]
+    );
+  };
+
+  const handleSubmit = async (evt) => {
+    evt.preventDefault();
+    setIsSaving(true);
+    setError(null);
+    try {
+      await onSave({ customRoleIds });
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <form className="employee-edit-form employee-role-editor" onSubmit={handleSubmit}>
+      <h3>Change company roles for {employee.name ?? employee.email}</h3>
+      <fieldset className="employee-roles" disabled={isSaving}>
+        <legend>Company roles</legend>
+        {companyRoles.length === 0 ? (
+          <p className="employee-roles-hint">
+            Your company has no roles yet. Create some under &quot;Roles&quot;.
+          </p>
+        ) : (
+          companyRoles.map((role) => (
+            <label key={role.id} className="employee-role">
+              <input
+                type="checkbox"
+                checked={customRoleIds.includes(role.id)}
+                onChange={() => handleToggleRole(role.id)}
+              />
+              {role.roleName}
+            </label>
+          ))
+        )}
+      </fieldset>
+      {error && <p className="employee-error">Could not save roles: {error}</p>}
+      <div className="employee-actions">
+        <button type="submit" disabled={isSaving}>
+          {isSaving ? 'Saving...' : 'Save roles'}
+        </button>
+        <button type="button" onClick={onCancel} disabled={isSaving}>
+          Back
+        </button>
+      </div>
+    </form>
+  );
+}
+
+function EmployeeItem({ employee, companyRoles, isSelf, onEmployeeUpdated }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isChangingRoles, setIsChangingRoles] = useState(false);
   const [draft, setDraft] = useState(employee);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -37,7 +100,17 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
 
   const cancelEditing = () => {
     setIsEditing(false);
+    setIsChangingRoles(false);
     setError(null);
+  };
+  
+  const handleSaveRoles = async ({ customRoleIds }) => {
+    await changeUserRole(employee.id, customRoleIds);
+    onEmployeeUpdated({
+      ...employee,
+      customRoles: companyRoles.filter((role) => customRoleIds.includes(role.id)),
+    });
+    setIsChangingRoles(false);
   };
 
   const handleChange = (evt) => {
@@ -98,6 +171,19 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
     );
   }
 
+  if (isChangingRoles) {
+    return (
+      <li className="employee-item">
+        <RoleEditor
+          employee={employee}
+          companyRoles={companyRoles}
+          onSave={handleSaveRoles}
+          onCancel={() => setIsChangingRoles(false)}
+        />
+      </li>
+    );
+  }
+
   return (
     <li className="employee-item">
       <form className="employee-edit-form" onSubmit={handleSave}>
@@ -127,6 +213,11 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
           <button type="button" onClick={cancelEditing} disabled={isSaving}>
             Cancel
           </button>
+          {!isSelf && (
+            <button type="button" onClick={() => setIsChangingRoles(true)} disabled={isSaving}>
+              Change company roles
+            </button>
+          )}
           {isSelf && isActive ? (
             <span className="employee-self-note">
               You cannot deactivate your own account or change your own role.
@@ -147,7 +238,7 @@ function EmployeeItem({ employee, isSelf, onEmployeeUpdated }) {
   );
 }
 
-export default function EmployeeList({ employees, currentUser, onEmployeeUpdated }) {
+export default function EmployeeList({ employees, roles = [], currentUser, onEmployeeUpdated }) {
   return (
     <div className="employee-list">
       <h2>Employee List</h2>
@@ -156,6 +247,7 @@ export default function EmployeeList({ employees, currentUser, onEmployeeUpdated
           <EmployeeItem
             key={employee.id}
             employee={employee}
+            companyRoles={roles}
             isSelf={isCurrentUser(currentUser, employee)}
             onEmployeeUpdated={onEmployeeUpdated}
           />

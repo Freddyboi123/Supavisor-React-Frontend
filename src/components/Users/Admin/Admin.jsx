@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeesFromAPI, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../apiReader'; // Assuming you have an API reader function
-import { getUserFromToken } from './Utils/GetUser';
+import { fetchEmployeeFromTenant, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../../../apiReader'; // Assuming you have an API reader function
+import { getUserFromToken } from '../../Utils/GetUser';
 import EmployeeList from './EmployeeList/EmployeeList';
 import CreateUserForm from './CreateUser/CreateUserForm';
 import RoleManager from './RoleManager/RoleManager';
-import AssignmentManager from './AssignmentManager/AssignmentManager';
+import AssignmentManager from '../../AssignmentManager/AssignmentManager';
+import { useNavigate } from "react-router";
 
 export default function Admin() {
 
@@ -12,6 +13,7 @@ export default function Admin() {
   const [roles, setRoles] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
   (async () => {
 
@@ -20,7 +22,7 @@ export default function Admin() {
     console.log('Logged-in user:', loggedInUser);
     try {
       const tennentID = loggedInUser?.tenantId;
-      const response = await fetchEmployeesFromAPI(tennentID);
+      const response = await fetchEmployeeFromTenant(tennentID);
       setArrayOfEmployees(response);
       console.log('Fetched employees:', response);
     } catch (error) {
@@ -83,10 +85,13 @@ export default function Admin() {
     setAssignments((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
   };
 
+ 
+
   return (
     <>
       <h1> you are on admin page</h1>
 
+      <button onClick={() => navigate('/admin/employeeDashboard')}>Go to Employee Dashboard</button>
       <CreateUserForm
         employees={ArrayOfEmplyees}
         roles={roles}
@@ -109,6 +114,7 @@ export default function Admin() {
 
       <EmployeeList
         employees={ArrayOfEmplyees}
+        roles={roles}
         currentUser={user}
         onEmployeeUpdated={handleEmployeeUpdated}
       />
