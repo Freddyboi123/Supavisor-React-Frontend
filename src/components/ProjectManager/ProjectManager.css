@@ -1,0 +1,193 @@
+.project-manager {
+  text-align: left;
+  margin-bottom: 24px;
+}
+
+.project-create {
+  margin-bottom: 16px;
+}
+
+.project-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.project-form > label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  font-size: 14px;
+}
+
+.project-form textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.project-assignment-fieldset {
+  margin: 0;
+  padding: 8px 10px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.project-assignment-fieldset legend {
+  padding: 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.project-assignment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.project-assignment-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.project-form-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.project-manager ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 620px;
+}
+
+.project-item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.project-title {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.project-name {
+  font-weight: 600;
+}
+
+.project-status {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.project-details {
+  min-width: 0;
+}
+
+.project-details dl {
+  margin: 6px 0 0;
+  font-size: 14px;
+}
+
+.project-details dl div {
+  display: flex;
+  gap: 8px;
+}
+
+.project-details dt {
+  min-width: 110px;
+  opacity: 0.7;
+}
+
+.project-details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.project-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-status-history {
+  flex-basis: 100%;
+  margin-top: 8px;
+}
+
+.project-status-history h3 {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.project-status-history-table-wrap {
+  overflow-x: auto;
+}
+
+.project-status-history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.project-status-history-table th,
+.project-status-history-table td {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.project-status-history-table th {
+  font-weight: 600;
+  background: #f7f7f7;
+}
+
+.project-delete {
+  color: #c62828;
+}
+
+.project-error {
+  flex-basis: 100%;
+  color: #c62828;
+  margin: 0;
+}
+
+.project-success {
+  color: #2e7d32;
+  margin: 0 0 12px;
+}
+
+.project-hint {
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+@media (max-width: 640px) {
+  .project-item,
+  .project-actions,
+  .project-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .project-details dl div {
+    flex-direction: column;
+    gap: 0;
+  }
+}

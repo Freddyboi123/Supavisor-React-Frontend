@@ -1,4 +1,5 @@
-const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+// const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
 
 export async function login(email, password) {
     return fetchFromServer('/auth/login', {
@@ -22,7 +23,7 @@ export function logout() {
 
 
 
-export function IsTokenValid(token) {
+export function IsTokenValid() {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
   }).then(() => true).catch(() => false);
@@ -131,7 +132,40 @@ export async function deactivateUserInAPI(employeeId) {
   });
 }
 
+// Projects
+export async function fetchProjectsFromAPI() {
+  return fetchFromServer('/project/all', {
+    method: 'GET',
+  });
+}
 
+// A project has a name, optional description, status and a list of assignment ids.
+export async function createProjectInAPI(project) {
+  return fetchFromServer('/project', {
+    method: 'POST',
+    body: project,
+  });
+}
+
+// Replaces the name and all project details.
+export async function updateProjectInAPI(id, project) {
+  return fetchFromServer(`/project/${encodeURIComponent(id)}`, {
+    method: 'PUT',
+    body: project,
+  });
+}
+
+export async function deleteProjectInAPI(id) {
+  return fetchFromServer(`/project/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function fetchProjectStatusHistoryFromAPI(projectId) {
+  return fetchFromServer(`/project/${encodeURIComponent(projectId)}/status-history`, {
+    method: 'GET',
+  });
+}
 
 
 
@@ -229,4 +263,3 @@ export async function fetchFromServer(url, options = {}) {
   //  og så vil vi gerne have den tekst tilbage i stedet for at prøve at parse det som json og så fejle. 
   // Det er en fallback for at håndtere ikke-json svar på en mere robust måde.
 }
-
