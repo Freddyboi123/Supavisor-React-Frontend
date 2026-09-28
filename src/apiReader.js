@@ -1,4 +1,6 @@
-const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+//const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
+const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
+
 
 export async function login(email, password) {
     return fetchFromServer('/auth/login', {
@@ -8,8 +10,8 @@ export async function login(email, password) {
     })
     .then((data) => {
         console.log
-        localStorage.setItem('jwtToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+   
+    localStorage.setItem('jwtToken', data.token);
         return data;
     })
 }
@@ -25,10 +27,11 @@ export function logout() {
 export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
+    body: { token },
   }).then(() => true).catch(() => false);
 }
 
-export async function fetchEmployeesFromAPI(tenantId) {
+export async function fetchEmployeeFromTenant(tenantId) {
   return fetchFromServer(`/user/tenant/${encodeURIComponent(tenantId)}`, {
     method: 'GET',
   });
@@ -163,6 +166,13 @@ export async function deleteProjectInAPI(id) {
 
 
 
+
+export async function changeUserRole(employeeId, customRoleIds) {
+  return fetchFromServer(`/user/${encodeURIComponent(employeeId)}/roles`, {
+    method: 'PUT',
+    body: { customRoleIds }
+  });
+}
 
 
 

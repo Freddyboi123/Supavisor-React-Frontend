@@ -60,3 +60,28 @@
   font-size: 14px;
   opacity: 0.7;
 }
+
+.employee-role-editor h3 {
+  margin: 0 0 4px;
+  font-size: 16px;
+}
+
+.employee-roles {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.employee-edit-form .employee-role {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.employee-roles-hint {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.7;
+}

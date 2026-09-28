@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import {login} from '../../apiReader.js';
+import {login} from '../../../apiReader.js';
 import { useNavigate } from "react-router";
 export default function Login() {
     const navigate = useNavigate();

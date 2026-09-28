@@ -1,0 +1,35 @@
+.role-group {
+  border-left: 6px solid var(--role-color);
+  background: color-mix(in srgb, var(--role-color) 8%, transparent);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.role-group h3 {
+  margin: 0 0 0.75rem;
+  color: var(--role-color);
+}
+
+.role-employees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.employee-card {
+  border: 1px solid var(--role-color);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  min-width: 160px;
+  background: #fff;
+}
+
+.employee-card .employee-name {
+  font-weight: 600;
+}
+
+.employee-card .employee-email {
+  font-size: 0.85rem;
+  color: #555;
+}

@@ -1,10 +1,12 @@
 import { Navigate, Outlet } from "react-router";
-import { IsTokenValid } from "../../../src/apiReader";
+import { IsTokenValid } from "../../../apiReader.js";
 import { useState, useEffect } from "react";
+import { getUserFromToken } from "../../Utils/GetUser.jsx";
 
 export default function ProtectedRoute() {
   const [token] = useState(localStorage.getItem('jwtToken'));
   const [tokenIsValid, setTokenIsValid] = useState(null); // null = "still checking"
+  const [currentUser] = useState(getUserFromToken());
 
 
   useEffect(() => {
@@ -12,6 +14,7 @@ export default function ProtectedRoute() {
 
     IsTokenValid(token).then((isValid) => {
       setTokenIsValid(isValid);
+      console.log('Token validity check result:', isValid); // Debugging line
     });
   }, [token]);
 
@@ -31,6 +34,5 @@ export default function ProtectedRoute() {
     alert("Din session er udløbet. Log ind igen for at fortsætte.");
     return <Navigate to="/auth/login" replace />;
   }
-
   return <Outlet />;
 }

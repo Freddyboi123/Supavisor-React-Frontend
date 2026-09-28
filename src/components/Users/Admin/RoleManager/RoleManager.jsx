@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createRoleInAPI, deleteRoleInAPI, getErrorMessage } from '../../apiReader';
+import { createRoleInAPI, deleteRoleInAPI, getErrorMessage } from '../../../../apiReader';
 import './RoleManager.css';
 
 // Lists the company's own roles (kitchen, cleaning ...) and lets an administrator add or remove them.

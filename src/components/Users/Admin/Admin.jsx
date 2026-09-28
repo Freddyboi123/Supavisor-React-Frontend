@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import {
-  fetchEmployeesFromAPI,
+  fetchEmployeeFromTenant,
   fetchRolesFromAPI,
   fetchAssignmentsFromAPI,
   fetchProjectsFromAPI,
-} from './apiReader'; // Assuming you have an API reader function
-import { getUserFromToken } from './components/Utils/GetUser';
-import EmployeeList from './components/EmployeeList/EmployeeList';
-import CreateUserForm from './components/CreateUser/CreateUserForm';
-import RoleManager from './components/RoleManager/RoleManager';
-import AssignmentManager from './components/AssignmentManager/AssignmentManager';
+} from '../../../apiReader'; // Assuming you have an API reader function
+import { getUserFromToken } from '../../Utils/GetUser';
+import EmployeeList from './EmployeeList/EmployeeList';
+import CreateUserForm from './CreateUser/CreateUserForm';
+import RoleManager from './RoleManager/RoleManager';
+import AssignmentManager from '../../AssignmentManager/AssignmentManager';
+import { useNavigate } from "react-router";
 import ProjectManager from './components/ProjectManager/ProjectManager';
 
 export default function Admin() {
@@ -19,6 +20,7 @@ export default function Admin() {
   const [assignments, setAssignments] = useState([]);
   const [projects, setProjects] = useState([]);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
   (async () => {
 
@@ -27,7 +29,7 @@ export default function Admin() {
     console.log('Logged-in user:', loggedInUser);
     try {
       const tennentID = loggedInUser?.tenantId;
-      const response = await fetchEmployeesFromAPI(tennentID);
+      const response = await fetchEmployeeFromTenant(tennentID);
       setArrayOfEmployees(response);
       console.log('Fetched employees:', response);
     } catch (error) {
@@ -115,6 +117,7 @@ export default function Admin() {
     <>
       <h1> you are on admin page</h1>
 
+      <button onClick={() => navigate('/admin/employeeDashboard')}>Go to Employee Dashboard</button>
       <CreateUserForm
         employees={ArrayOfEmplyees}
         roles={roles}
@@ -145,6 +148,7 @@ export default function Admin() {
 
       <EmployeeList
         employees={ArrayOfEmplyees}
+        roles={roles}
         currentUser={user}
         onEmployeeUpdated={handleEmployeeUpdated}
       />
