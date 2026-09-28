@@ -1,17 +1,26 @@
 import { useState, useEffect } from 'react';
-import { fetchEmployeeFromTenant, fetchRolesFromAPI, fetchAssignmentsFromAPI } from '../../../apiReader'; // Assuming you have an API reader function
+import {
+  fetchEmployeeFromTenant,
+  fetchRolesFromAPI,
+  fetchAssignmentsFromAPI,
+  fetchProjectsFromAPI,
+} from '../../../apiReader'; // Assuming you have an API reader function
 import { getUserFromToken } from '../../Utils/GetUser';
 import EmployeeList from './EmployeeList/EmployeeList';
 import CreateUserForm from './CreateUser/CreateUserForm';
 import RoleManager from './RoleManager/RoleManager';
 import AssignmentManager from '../../AssignmentManager/AssignmentManager';
 import { useNavigate } from "react-router";
+import ProjectManager from './components/ProjectManager/ProjectManager';
 
 export default function Admin() {
 
   const [ArrayOfEmplyees, setArrayOfEmployees] = useState([]);
   const [roles, setRoles] = useState([]);
   const [assignments, setAssignments] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [projectLoadError, setProjectLoadError] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -37,6 +46,16 @@ export default function Admin() {
       setAssignments(await fetchAssignmentsFromAPI());
     } catch (error) {
       console.error('Error fetching assignments:', error);
+    }
+    try {
+      setIsLoadingProjects(true);
+      setProjectLoadError(null);
+      setProjects(await fetchProjectsFromAPI());
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+      setProjectLoadError(error);
+    } finally {
+      setIsLoadingProjects(false);
     }
   })();
 }, []);
@@ -85,7 +104,21 @@ export default function Admin() {
     setAssignments((prev) => prev.filter((assignment) => assignment.id !== assignmentId));
   };
 
- 
+  const handleProjectCreated = (createdProject) => {
+    setProjects((prev) => [...prev, createdProject]);
+  };
+
+  const handleProjectUpdated = (updatedProject) => {
+    setProjects((prev) =>
+      prev.map((project) =>
+        project.id === updatedProject.id ? updatedProject : project
+      )
+    );
+  };
+
+  const handleProjectDeleted = (projectId) => {
+    setProjects((prev) => prev.filter((project) => project.id !== projectId));
+  };
 
   return (
     <>
@@ -110,6 +143,16 @@ export default function Admin() {
         onAssignmentCreated={handleAssignmentCreated}
         onAssignmentUpdated={handleAssignmentUpdated}
         onAssignmentDeleted={handleAssignmentDeleted}
+      />
+
+      <ProjectManager
+        projects={projects}
+        assignments={assignments}
+        isLoading={isLoadingProjects}
+        loadError={projectLoadError}
+        onProjectCreated={handleProjectCreated}
+        onProjectUpdated={handleProjectUpdated}
+        onProjectDeleted={handleProjectDeleted}
       />
 
       <EmployeeList
