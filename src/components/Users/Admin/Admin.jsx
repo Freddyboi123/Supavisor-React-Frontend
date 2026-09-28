@@ -19,6 +19,8 @@ export default function Admin() {
   const [roles, setRoles] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+  const [projectLoadError, setProjectLoadError] = useState(null);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
@@ -46,9 +48,14 @@ export default function Admin() {
       console.error('Error fetching assignments:', error);
     }
     try {
+      setIsLoadingProjects(true);
+      setProjectLoadError(null);
       setProjects(await fetchProjectsFromAPI());
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setProjectLoadError(error);
+    } finally {
+      setIsLoadingProjects(false);
     }
   })();
 }, []);
@@ -141,6 +148,8 @@ export default function Admin() {
       <ProjectManager
         projects={projects}
         assignments={assignments}
+        isLoading={isLoadingProjects}
+        loadError={projectLoadError}
         onProjectCreated={handleProjectCreated}
         onProjectUpdated={handleProjectUpdated}
         onProjectDeleted={handleProjectDeleted}

@@ -3,6 +3,7 @@ import {
   createProjectInAPI,
   updateProjectInAPI,
   deleteProjectInAPI,
+  fetchProjectStatusHistoryFromAPI,
   getErrorMessage,
 } from '../../apiReader';
 import './ProjectManager.css';
@@ -22,7 +23,19 @@ function byName(a, b) {
 }
 
 function statusLabel(status) {
-  return PROJECT_STATUSES.find(([value]) => value === status)?.[1] ?? status ?? 'Draft';
+  if (!status) return null;
+  return PROJECT_STATUSES.find(([value]) => value === status)?.[1] ?? status;
+}
+
+function formatDateTime(value) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
+}
+
+function formatAuditUser(value) {
+  return value || null;
 }
 
 function toDraft(project) {
@@ -198,10 +211,15 @@ function ProjectItem({
   assignments,
   onProjectUpdated,
   onProjectDeleted,
+  onActionSuccess,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isBusy, setIsBusy] = useState(false);
   const [error, setError] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+  const [statusHistory, setStatusHistory] = useState([]);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [historyError, setHistoryError] = useState(null);
 
   const assignmentNames = (project.assignmentIds ?? []).map((assignmentId) => {
     const assignment = assignments.find((candidate) => candidate.id === assignmentId);
@@ -210,6 +228,10 @@ function ProjectItem({
   const details = [
     ['Description', project.description],
     ['Assignments', assignmentNames.length > 0 ? assignmentNames.join(', ') : null],
+    ['Created by', formatAuditUser(project.createdBy)],
+    ['Created at', formatDateTime(project.createdAt)],
+    ['Last updated by', formatAuditUser(project.updatedBy)],
+    ['Last updated at', formatDateTime(project.updatedAt)],
   ];
 
   // Runs a request, reporting its error on this row.
@@ -228,6 +250,7 @@ function ProjectItem({
   const handleSave = async (payload) => {
     onProjectUpdated(await updateProjectInAPI(project.id, payload));
     setIsEditing(false);
+    onActionSuccess('Project updated.');
   };
 
   const handleDelete = () => {
@@ -235,7 +258,24 @@ function ProjectItem({
     return run(async () => {
       await deleteProjectInAPI(project.id);
       onProjectDeleted(project.id);
+      onActionSuccess('Project deleted.');
     });
+  };
+
+  const handleToggleHistory = async () => {
+    const nextShowHistory = !showHistory;
+    setShowHistory(nextShowHistory);
+    if (!nextShowHistory || statusHistory.length > 0) return;
+
+    setIsLoadingHistory(true);
+    setHistoryError(null);
+    try {
+      setStatusHistory(await fetchProjectStatusHistoryFromAPI(project.id));
+    } catch (err) {
+      setHistoryError(getErrorMessage(err));
+    } finally {
+      setIsLoadingHistory(false);
+    }
   };
 
   if (isEditing) {
@@ -258,7 +298,7 @@ function ProjectItem({
       <div className="project-details">
         <div className="project-title">
           <span className="project-name">{project.name}</span>
-          <span className="project-status">{statusLabel(project.status)}</span>
+          <span className="project-status">{statusLabel(project.status) ?? 'Draft'}</span>
         </div>
         <dl>
           {details.map(([label, value]) => (
@@ -273,11 +313,49 @@ function ProjectItem({
         <button type="button" onClick={() => setIsEditing(true)} disabled={isBusy}>
           Edit
         </button>
+        <button type="button" onClick={handleToggleHistory} disabled={isBusy || isLoadingHistory}>
+          {showHistory ? 'Hide history' : 'Status history'}
+        </button>
         <button type="button" className="project-delete" onClick={handleDelete} disabled={isBusy}>
           Delete
         </button>
       </div>
       {error && <p className="project-error">{error}</p>}
+      {showHistory && (
+        <div className="project-status-history">
+          <h3>Status History</h3>
+          {isLoadingHistory ? (
+            <p className="project-hint">Loading status history...</p>
+          ) : historyError ? (
+            <p className="project-error">Could not load status history: {historyError}</p>
+          ) : statusHistory.length === 0 ? (
+            <p className="project-hint">No status changes yet.</p>
+          ) : (
+            <div className="project-status-history-table-wrap">
+              <table className="project-status-history-table">
+                <thead>
+                  <tr>
+                    <th>Changed at</th>
+                    <th>Changed by</th>
+                    <th>From status</th>
+                    <th>To status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {statusHistory.map((entry) => (
+                    <tr key={entry.id}>
+                      <td>{formatDateTime(entry.changedAt) ?? '-'}</td>
+                      <td>{entry.changedBy ?? '-'}</td>
+                      <td>{statusLabel(entry.fromStatus) ?? '-'}</td>
+                      <td>{statusLabel(entry.toStatus)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
     </li>
   );
 }
@@ -287,24 +365,37 @@ function ProjectItem({
 export default function ProjectManager({
   projects,
   assignments,
+  isLoading = false,
+  loadError = null,
   onProjectCreated,
   onProjectUpdated,
   onProjectDeleted,
 }) {
+  const [success, setSuccess] = useState(null);
+
+  const handleCreated = async (payload) => {
+    onProjectCreated(await createProjectInAPI(payload));
+    setSuccess('Project created.');
+  };
+
   return (
     <div className="project-manager">
       <h2>Projects</h2>
+      {success && <p className="project-success">{success}</p>}
+      {loadError && <p className="project-error">Could not load projects: {getErrorMessage(loadError)}</p>}
       <div className="project-create">
         <ProjectForm
           projects={projects}
           assignments={assignments}
           submitLabel="Add project"
           resetOnSuccess
-          onSubmit={async (payload) => onProjectCreated(await createProjectInAPI(payload))}
+          onSubmit={handleCreated}
         />
       </div>
 
-      {projects.length === 0 ? (
+      {isLoading ? (
+        <p className="project-hint">Loading projects...</p>
+      ) : projects.length === 0 ? (
         <p className="project-hint">No projects yet.</p>
       ) : (
         <ul>
@@ -316,6 +407,7 @@ export default function ProjectManager({
               assignments={assignments}
               onProjectUpdated={onProjectUpdated}
               onProjectDeleted={onProjectDeleted}
+              onActionSuccess={setSuccess}
             />
           ))}
         </ul>
