@@ -1,7 +1,6 @@
 // const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
 const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
-//const BACKEND_URL = 'https://supaapi.project-ice.dk/api'
-const BACKEND_URL = import.meta.env.VITE_LOCAL_API_URL ?? 'https://supaapi.project-ice.dk/api'
+
 
 
 export async function login(email, password) {
@@ -26,7 +25,7 @@ export function logout() {
 
 
 
-export function IsTokenValid() {
+export function IsTokenValid(token) {
   return fetchFromServer('/auth/token-validation', {
     method: 'POST',
     body: { token },

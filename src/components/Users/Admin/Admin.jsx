@@ -11,7 +11,7 @@ import CreateUserForm from './CreateUser/CreateUserForm';
 import RoleManager from './RoleManager/RoleManager';
 import AssignmentManager from '../../AssignmentManager/AssignmentManager';
 import { useNavigate } from "react-router";
-import ProjectManager from './components/ProjectManager/ProjectManager';
+import ProjectManager from '../../ProjectManager/ProjectManager';
 
 export default function Admin() {
 

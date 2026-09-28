@@ -8,6 +8,8 @@ import {
 } from '../../apiReader';
 import './ProjectManager.css';
 
+
+
 // Mirrors the backend limits.
 const MAX_NAME_LENGTH = 100;
 const MAX_DESCRIPTION_LENGTH = 1000;
